@@ -5,6 +5,8 @@ from openpi import transforms
 import openpi.models.model as model
 import openpi.policies.libero_policy as libero_policy
 
+
+# TODO: Add deltas -> delta joint angles
 @dataclasses.dataclass(frozen=True)
 class RRLInputs(transforms.DataTransformFn):
 
