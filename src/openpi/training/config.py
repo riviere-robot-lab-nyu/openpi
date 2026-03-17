@@ -354,7 +354,7 @@ class RRL_cabinet_dataconfig(DataConfigFactory):
             ]
         )
         data_transforms = _transforms.Group(
-            inputs=[rrl_policy.RRLInputs(model_type=model_config.model_type)],
+            inputs=[rrl_policy.RRLInputs()],
             outputs=[rrl_policy.RRLOutputs()],
         )
 

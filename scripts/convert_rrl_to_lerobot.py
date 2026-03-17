@@ -12,7 +12,6 @@ import shutil
 from typing import Literal
 
 import h5py
-from lerobot.common.datasets.lerobot_dataset import LEROBOT_HOME
 from lerobot.common.datasets.lerobot_dataset import LeRobotDataset
 import numpy as np
 import torch
@@ -116,12 +115,14 @@ def populate_dataset(
 ) -> LeRobotDataset:
     with h5py.File(hdf5_file, "r") as f:
         episodes = list(f["data"].keys())
-
+        n_episodes = len(episodes)
+        print(f"Processing {n_episodes} episodes")
         for ep in episodes:
             ep_data = f["data"][ep]
             state = torch.from_numpy(ep_data["observation/state"][:])
             raw_acts = ep_data["actions"][:]
-            action = torch.from_numpy(np.concatenate([raw_acts[:,3:], raw_acts[:,:3]],axis=1))
+            #action = torch.from_numpy(np.concatenate([raw_acts[:,3:], raw_acts[:,:3]],axis=1))
+            action = torch.from_numpy(raw_acts)
             raw_base = ep_data["observation/images/base"][:]
             raw_wrist = ep_data["observation/images/wrist"][:]
 
@@ -134,12 +135,14 @@ def populate_dataset(
                     "observation.state": state[i],
                     "action": action[i],
                     "observation.images.base": base_imgs[i],
-                    "observation.images.wrist": wrist_imgs[i]
+                    "observation.images.wrist": wrist_imgs[i],
+                    "task": task,
                 }
 
                 dataset.add_frame(frame)
-            
-            dataset.save_episode(task = task)
+            print("Finished episode: ")
+            print(ep)
+            dataset.save_episode()
     
     return dataset
 
@@ -167,17 +170,12 @@ def port_rrl(
         task=task,
     )
 
-    dataset.consolidate()
+    #dataset.consolidate()
 
-    print(f"Dataset successfully built locally at: {LEROBOT_HOME / repo_id}")
+    print(f"Dataset successfully built locally at: {repo_id}")
 
 
 if __name__ == "__main__":
     tyro.cli(port_rrl)
-
-
-
-
-
 
 
